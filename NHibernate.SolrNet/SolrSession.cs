@@ -20,12 +20,14 @@ using NHibernate.SolrNet.Impl;
 using SolrNet;
 using SolrNet.Impl;
 
-namespace NHibernate.SolrNet {
+namespace NHibernate.SolrNet
+{
     /// <summary>
     /// NHibernate <see cref="ISession"/> with SolrNet extensions for querying
     /// </summary>
     [Obsolete("Deprecated. Replace with your own integration.")]
-    public class SolrSession : DelegatingSession, ISolrSession {
+    public class SolrSession : DelegatingSession, ISolrSession
+    {
         private readonly ISession session;
         private readonly IServiceProvider provider;
 
@@ -34,7 +36,7 @@ namespace NHibernate.SolrNet {
         /// </summary>
         /// <param name="session">NHibernate session to wrap</param>
         /// <remarks>The wrapped session is owned by this session. It will be disposed when this session is disposed</remarks>
-        public SolrSession(ISession session) : this(session, ServiceLocator.Current) {}
+        public SolrSession(ISession session) : this(session, ServiceLocator.Current) { }
 
         /// <summary>
         /// Creates a session using a defined <see cref="IServiceProvider"/> to fetch SolrNet components
@@ -42,13 +44,10 @@ namespace NHibernate.SolrNet {
         /// <param name="session">NHibernate session to wrap</param>
         /// <param name="provider">Used to fetch SolrNet components</param>
         /// <remarks>The wrapped session is owned by this session. It will be disposed when this session is disposed</remarks>
-        public SolrSession(ISession session, IServiceProvider provider) : base(session) {
-            if (session == null)
-                throw new ArgumentNullException("session");
-            if (provider == null)
-                throw new ArgumentNullException("provider");
-            this.session = session;
-            this.provider = provider;
+        public SolrSession(ISession session, IServiceProvider provider) : base(session)
+        {
+            this.session = session ?? throw new ArgumentNullException("session");
+            this.provider = provider ?? throw new ArgumentNullException("provider");
         }
 
         /// <summary>
@@ -56,7 +55,8 @@ namespace NHibernate.SolrNet {
         /// </summary>
         /// <param name="query">Solr query</param>
         /// <returns>query object</returns>
-        public INHSolrQuery CreateSolrQuery(string query) {
+        public INHSolrQuery CreateSolrQuery(string query)
+        {
             return new NHSolrQueryImpl(provider, query, session.FlushMode, session.GetSessionImplementation(), null);
         }
 
@@ -65,8 +65,9 @@ namespace NHibernate.SolrNet {
         /// </summary>
         /// <param name="query">Solr query</param>
         /// <returns>query object</returns>
-        public INHSolrQuery CreateSolrQuery(ISolrQuery query) {
-            var serializer = (ISolrQuerySerializer) provider.GetService(typeof (ISolrQuerySerializer));
+        public INHSolrQuery CreateSolrQuery(ISolrQuery query)
+        {
+            var serializer = (ISolrQuerySerializer)provider.GetService(typeof(ISolrQuerySerializer));
             return CreateSolrQuery(serializer.Serialize(query));
         }
     }
